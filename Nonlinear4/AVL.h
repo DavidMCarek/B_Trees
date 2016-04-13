@@ -6,13 +6,14 @@
 #pragma once
 #include <string>
 #include <chrono>
+#include <fstream>
 
 class AVL
 {
 public:
-	AVL();
+	AVL(std::string treeFilePath);
 	~AVL();
-	void insert(char * input[50]);
+	void insert(char input[50]);
 	void list(); 
 	void printStats();
 	void setInsertTime(std::chrono::duration<double> insertTime);
@@ -21,7 +22,7 @@ private:
 	struct Node {
 		int leftChild = 0;
 		int rightChild = 0;
-		char * value[50];
+		char value[50];
 		int count = 1;
 		int balanceFactor = 0;
 	};
@@ -35,9 +36,13 @@ private:
 	std::chrono::duration<double> totalInsertTime;
 	void setStats();
 	void traverseSetStats(Node* node, int nodeHeight);
-	Node * Root;
 	void traverseAndPrint(Node * node);
 	void printNodeInfo(Node * node);
-	Node * readFromDisk(int lineNumber);
+	unsigned int uniqueInserts = 0;
+	int nodeSize = sizeof(Node);
+	Node readFromDisk(unsigned int offset);
+	void writeToDisk(Node node, unsigned int offset);
+	std::fstream treeFile;
+	std::string treeFilePath;
 };
 
