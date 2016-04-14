@@ -11,12 +11,17 @@ using namespace std;
 
 int main()
 {
-	AVL avl("c:\\Users\\DMCar\\Desktop\\test.txt");
+	AVL avl("C:\\Users\\DMCar\\Desktop\\test.txt");
 	char input[50] {0};
 
 	input[0] = 'f';
 	input[1] = 'o';
 	input[2] = 'o';
+	avl.insert(input);
+
+	input[0] = 'b';
+	input[1] = 'a';
+	input[2] = 'r';
 	avl.insert(input);
 	
     return 0;

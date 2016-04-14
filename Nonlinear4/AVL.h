@@ -20,16 +20,19 @@ public:
 	void setFilePath(std::string filePath);
 private:
 	struct Node {
-		int leftChild = 0;
-		int rightChild = 0;
+		int leftChild = -1;
+		int rightChild = -1;
 		char value[50];
-		int count = 1;
+		unsigned int count = 0;
 		int balanceFactor = 0;
+		int index = -1;
 	};
+	Node node1;
+	Node node2;
+	Node node3;
 	std::string filePath;
 	int treeHeight = 0;
 	long itemsInTree = 0;
-	long uniqueItemsInTree = 0;
 	long keyComparisons = 0;
 	long nodePointerChanges = 0;
 	long balanceFactorChanges = 0;
@@ -39,9 +42,10 @@ private:
 	void traverseAndPrint(Node * node);
 	void printNodeInfo(Node * node);
 	unsigned int uniqueInserts = 0;
+	int root = -1;
 	int nodeSize = sizeof(Node);
-	Node readFromDisk(unsigned int offset);
-	void writeToDisk(Node node, unsigned int offset);
+	Node readFromDisk(unsigned int index);
+	void writeToDisk(Node node, unsigned int index);
 	std::fstream treeFile;
 	std::string treeFilePath;
 };
