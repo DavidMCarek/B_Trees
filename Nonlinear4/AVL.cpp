@@ -41,66 +41,6 @@ AVL::Node AVL::readFromDisk(unsigned int index)
 // to maintain the balance of the tree
 void AVL::insert(char input[50])
 {
-	if (uniqueInserts == 0)
-	{
-		
-		for (int i = 0; i < 50; i++)
-			node1.value[i] = input[i];
-
-		node1.count = 1;
-		node1.index = 0;
-		writeToDisk(node1, 0);
-		uniqueInserts++;
-		return;
-	}
-
-	node1 = readFromDisk(0);
-
-	while (true)
-	{
-		node2 = node1;
-
-		if (input < node1.value)
-			node1 = readFromDisk(node1.leftChild);
-		else if (input > node1.value)
-			node1 = readFromDisk(node1.rightChild);
-		else
-		{
-			node1.count++;
-			writeToDisk(node1, node1.index);
-			return;
-		}
-		if (node1.index == -1)
-		{
-			node1.count++;
-			for (int i = 0; i < 50; i++)
-				node1.value[i] = input[i];
-			node1.index = uniqueInserts;
-
-			writeToDisk(node1, node1.index);
-
-			if (input < node2.value)
-				node2.leftChild = uniqueInserts;
-			else
-				node2.rightChild = uniqueInserts;
-
-			writeToDisk(node2, node2.index);
-			uniqueInserts++;
-			return;
-		}
-	}
-
-
-
-
-
-
-
-
-
-
-
-
 	node1 = readFromDisk(root);
 	
 	// If the root is null we only need to do a dumb insert and nothing else
