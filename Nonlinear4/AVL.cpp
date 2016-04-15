@@ -16,7 +16,6 @@ AVL::AVL(std::string treeFilePath)
 		std::cout << "failed to open file" << std::endl;
 }
 
-
 AVL::~AVL()
 {
 	treeFile.close();
@@ -24,16 +23,20 @@ AVL::~AVL()
 
 void AVL::writeToDisk(Node node, unsigned int index)
 {
+	treeFile.open(treeFilePath);
 	treeFile.seekp(index * sizeof(Node), treeFile.beg);
 	char * buffer = (char *)&node;
 	treeFile.write(buffer, sizeof(Node));
+	treeFile.close();
 }
 
 AVL::Node AVL::readFromDisk(unsigned int index)
 {
+	treeFile.open(treeFilePath);
 	Node node;
 	treeFile.seekg(index * sizeof(Node));
 	treeFile.read((char *)&node, sizeof(Node));
+	treeFile.close();
 	return node;
 }
 
