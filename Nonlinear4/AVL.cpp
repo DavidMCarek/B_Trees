@@ -14,6 +14,7 @@ AVL::AVL(std::string treeFilePath)
 	treeFile.open(treeFilePath);
 	if (treeFile.fail())
 		std::cout << "failed to open file" << std::endl;
+	treeFile.close();
 }
 
 AVL::~AVL()
@@ -99,6 +100,7 @@ void AVL::insert(char input[50])
 	node1.count = 1;
 	node1.index = uniqueInserts;
 	writeToDisk(node1, node1.index);
+	uniqueInserts++;
 	int y = node1.index;
 
 	int b; // this is the child of the most recent nonzero balance factor in the direction of the potential rotation
@@ -218,6 +220,8 @@ void AVL::insert(char input[50])
 			// then c's balance factor is fixed and set to 0
 			node3.balanceFactor = 0;
 			b = node3.index; // this is for reattaching the subtree to the proper parent
+
+			writeToDisk(node3, node3.index);
 		}
 	}
 	else // again the next parts are symmetric so almost all the operations are just flipped
@@ -246,12 +250,13 @@ void AVL::insert(char input[50])
 
 			node3.balanceFactor = 0;
 			b = node3.index;
+
+			writeToDisk(node3, node3.index);
 		}
 	}
 
 	writeToDisk(node1, node1.index);
 	writeToDisk(node2, node2.index);
-	writeToDisk(node3, node3.index);
 
 	// if the parent of the recent non zero balance factor node was null then there were no nodes with a nonzero balance
 	// or the only one was the root. in either case the recent non zero was the root so whatever is in position b needs to 

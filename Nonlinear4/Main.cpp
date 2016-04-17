@@ -17,10 +17,7 @@ int main()
 	// set of delimiters for reading in the file
 	char delimiters[11] = { 9 , 10 , 13 , 32 , '.' , ',' , '!' , ';' , ':' , '(' , ')' };
 
-
-
-
-	AVL * avl = new AVL("C:\\Users\\DMCar\\Desktop\\test.txt");
+	AVL avl("C:\\Users\\DMCar\\Desktop\\test.txt");
 	
 	std::ifstream inputStream;
 	inputStream.open(inputFilePath, std::ios::binary); // binary flag is set to read the file one byte at a time
@@ -50,7 +47,7 @@ int main()
 			if (nextChar == delimiter)
 			{
 				if (input[0])
-					avl->insert(input);
+					avl.insert(input);
 
 				memset(input, 0, sizeof(input));
 				index = -1;
@@ -74,7 +71,12 @@ int main()
 
 		inputStream.get(nextChar); // try to read the next character
 	}
-	delete avl;
+
+	if (input[0] != 0)
+	{
+		avl.insert(input);
+	}
+
     return 0;
 }
 
