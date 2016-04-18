@@ -14,15 +14,13 @@ public:
 	AVL(std::string treeFilePath);
 	~AVL();
 	void insert(char input[50]);
-	void list(); 
 	void printStats();
-	void setInsertTime(std::chrono::duration<double> insertTime);
 	void setFilePath(std::string filePath);
 private:
 	struct Node {
 		int leftChild = -1;
 		int rightChild = -1;
-		char value[50];
+		char value[30];
 		unsigned int count = 0;
 		int balanceFactor = 0;
 		int index = -1;
@@ -33,19 +31,14 @@ private:
 	std::string filePath;
 	int treeHeight = 0;
 	long itemsInTree = 0;
-	long keyComparisons = 0;
-	long nodePointerChanges = 0;
-	long balanceFactorChanges = 0;
 	std::chrono::duration<double> totalInsertTime;
 	void setStats();
-	void traverseSetStats(Node* node, int nodeHeight);
-	void traverseAndPrint(Node * node);
-	void printNodeInfo(Node * node);
+	void traverseSetStats(Node node, int nodeHeight);
 	unsigned int uniqueInserts = 0;
 	int root = -1;
 	int nodeSize = sizeof(Node);
 	Node readFromDisk(unsigned int index);
-	void writeToDisk(Node node, unsigned int index);
+	void writeToDisk(Node node);
 	std::fstream treeFile;
 	std::string treeFilePath;
 };

@@ -22,10 +22,13 @@ AVL::~AVL()
 	treeFile.close();
 }
 
-void AVL::writeToDisk(Node node, unsigned int index)
+void AVL::writeToDisk(Node node)
 {
+	if (node.index < 0)
+		std::cout << "damn it";
+	treeFile.setf(std::ios::binary);
 	treeFile.open(treeFilePath);
-	treeFile.seekp(index * sizeof(Node), treeFile.beg);
+	treeFile.seekp(node.index * sizeof(Node), treeFile.beg);
 	char * buffer = (char *)&node;
 	treeFile.write(buffer, sizeof(Node));
 	treeFile.close();
@@ -33,6 +36,7 @@ void AVL::writeToDisk(Node node, unsigned int index)
 
 AVL::Node AVL::readFromDisk(unsigned int index)
 {
+	treeFile.setf(std::ios::binary);
 	treeFile.open(treeFilePath);
 	Node node;
 	treeFile.seekg(index * sizeof(Node));
@@ -43,19 +47,19 @@ AVL::Node AVL::readFromDisk(unsigned int index)
 
 // inserts a node into the tree and then checks balance factors to decide if a rotation is needed
 // to maintain the balance of the tree
-void AVL::insert(char input[50])
+void AVL::insert(char input[30])
 {
 	node1 = readFromDisk(root);
 	
 	// If the root is null we only need to do a dumb insert and nothing else
 	if (node1.index == -1)
 	{
-		for (int i = 0; i < 50; i++)
+		for (int i = 0; i < 30; i++)
 			node1.value[i] = input[i];
 
 		node1.count = 1;
 		node1.index = 0;
-		writeToDisk(node1, 0);
+		writeToDisk(node1);
 		root = 0;
 		uniqueInserts++;
 		return;
@@ -71,12 +75,16 @@ void AVL::insert(char input[50])
 
 	// while the current node is not at the child of a leaf or a duplicate value keep traversing through the tree
 	// keeping track of the most recent nonzero balance factor node
+
+	if (strcmp("HELENA", node1.value) == 0)
+		std::cout << "pause";
+
 	while (p != -1)
 	{
-		if (input == node1.value)
+		if (strcmp(input, node1.value) == 0)
 		{
 			node1.count++;
-			writeToDisk(node1, node1.index);
+			writeToDisk(node1);
 			return;
 		}
 
@@ -87,19 +95,19 @@ void AVL::insert(char input[50])
 		}
 
 		q = p;
-		p = (input < node1.value) ? node1.leftChild : node1.rightChild;
-		node1 = (input < node1.value) ? readFromDisk(node1.leftChild) : readFromDisk(node1.rightChild);
+		p = (strcmp(input, node1.value) < 0) ? node1.leftChild : node1.rightChild;
+		node1 = (strcmp(input, node1.value) < 0) ? readFromDisk(node1.leftChild) : readFromDisk(node1.rightChild);
 	}
 
 	// Now the previous node is a leaf and the current node is the child of that leaf so we need
 	// to create a new node to insert
 
 	// node to insert is node1
-	for (int i = 0; i < 50; i++)
+	for (int i = 0; i < 30; i++)
 		node1.value[i] = input[i];
 	node1.count = 1;
 	node1.index = uniqueInserts;
-	writeToDisk(node1, node1.index);
+	writeToDisk(node1);
 	uniqueInserts++;
 	int y = node1.index;
 
@@ -109,12 +117,12 @@ void AVL::insert(char input[50])
 	node2 = readFromDisk(q);
 	// we need to know if the new node we are inserting is the left or the right child of the previous node so we
 	// can have the correct child pointer point to the new node
-	if (input < node2.value)
+	if (strcmp(input, node2.value) < 0)
 		node2.leftChild = node1.index;
 	else
 		node2.rightChild = node1.index;
 
-	writeToDisk(node2, node2.index);
+	writeToDisk(node2);
 
 	// if the value of the node we just inserted is less than that of the most recent nonzero balance factor node
 	// then we went left so the pivot needs to be the left child else its the right child
@@ -122,7 +130,7 @@ void AVL::insert(char input[50])
 
 	node3 = readFromDisk(a);
 
-	if (input > node3.value)
+	if (strcmp(input, node3.value) > 0)
 	{
 		p = node3.rightChild;
 		displacement = -1;
@@ -139,18 +147,18 @@ void AVL::insert(char input[50])
 	// on the way down
 	while (p != y)
 	{
-		if (input > node1.value)
+		if (strcmp(input, node1.value) > 0)
 		{
 			node1.balanceFactor = -1;
 			p = node1.rightChild;
-			writeToDisk(node1, node1.index);
+			writeToDisk(node1);
 			node1 = readFromDisk(node1.rightChild);
 		}
 		else
 		{
 			node1.balanceFactor = 1;
 			p = node1.leftChild;
-			writeToDisk(node1, node1.index);
+			writeToDisk(node1);
 			node1 = readFromDisk(node1.leftChild);
 		}
 	}
@@ -160,7 +168,7 @@ void AVL::insert(char input[50])
 	if (0 == node3.balanceFactor)
 	{
 		node3.balanceFactor = displacement;
-		writeToDisk(node3, node3.index);
+		writeToDisk(node3);
 		return;
 	}
 
@@ -168,7 +176,7 @@ void AVL::insert(char input[50])
 	if (node3.balanceFactor == -displacement)
 	{
 		node3.balanceFactor = 0;
-		writeToDisk(node3, node3.index);
+		writeToDisk(node3);
 		return;
 	}
 
@@ -221,7 +229,7 @@ void AVL::insert(char input[50])
 			node3.balanceFactor = 0;
 			b = node3.index; // this is for reattaching the subtree to the proper parent
 
-			writeToDisk(node3, node3.index);
+			writeToDisk(node3);
 		}
 	}
 	else // again the next parts are symmetric so almost all the operations are just flipped
@@ -251,12 +259,12 @@ void AVL::insert(char input[50])
 			node3.balanceFactor = 0;
 			b = node3.index;
 
-			writeToDisk(node3, node3.index);
+			writeToDisk(node3);
 		}
 	}
 
-	writeToDisk(node1, node1.index);
-	writeToDisk(node2, node2.index);
+	writeToDisk(node1);
+	writeToDisk(node2);
 
 	// if the parent of the recent non zero balance factor node was null then there were no nodes with a nonzero balance
 	// or the only one was the root. in either case the recent non zero was the root so whatever is in position b needs to 
@@ -276,10 +284,46 @@ void AVL::insert(char input[50])
 	else // otherwise its the right child that needs reattached
 		node1.rightChild = b;
 
-	writeToDisk(node1, node1.index);
+	writeToDisk(node1);
 }
 
 void AVL::setFilePath(std::string filePath)
 {
 	this->filePath = filePath;
+}
+
+void AVL::setStats()
+{
+	treeHeight = 0;
+	itemsInTree = 0;
+	if (root == -1)
+		return;
+
+	// if the set is not empty traverse the list in order and output the node values and counts
+	traverseSetStats(readFromDisk(root), treeHeight);
+}
+
+void AVL::traverseSetStats(Node node, int nodeHeight)
+{
+	itemsInTree += node.count;
+	if (node.leftChild != -1)
+		traverseSetStats(readFromDisk(node.leftChild), nodeHeight + 1);
+
+	if (node.rightChild != -1)
+		traverseSetStats(readFromDisk(node.rightChild), nodeHeight + 1);
+
+	if (nodeHeight > treeHeight)
+		treeHeight = nodeHeight;
+}
+
+void AVL::printStats()
+{
+	setStats();
+	std::cout
+		<< "<----------AVL Statistics---------->" << std::endl
+		<< "Tree height : " << treeHeight << std::endl
+		<< "Total items : " << itemsInTree << std::endl
+		<< "Unique items : " << uniqueInserts << std::endl
+		<< "Number of nodes : " << uniqueInserts << std::endl
+		<< "<---------------------------------->" << std::endl << std::endl;
 }
