@@ -13,9 +13,8 @@ class AVL
 public:
 	AVL(std::string treeFilePath);
 	~AVL();
-	void insert(char input[50]);
+	void insert(char input[30]);
 	void printStats();
-	void setFilePath(std::string filePath);
 private:
 	struct Node {
 		int leftChild = -1;
@@ -28,7 +27,6 @@ private:
 	Node node1;
 	Node node2;
 	Node node3;
-	std::string filePath;
 	int treeHeight = 0;
 	long itemsInTree = 0;
 	std::chrono::duration<double> totalInsertTime;
@@ -36,7 +34,6 @@ private:
 	void traverseSetStats(Node node, int nodeHeight);
 	unsigned int uniqueInserts = 0;
 	int root = -1;
-	int nodeSize = sizeof(Node);
 	Node readFromDisk(int index);
 	void writeToDisk(Node node);
 	std::ifstream inputTreeFile;

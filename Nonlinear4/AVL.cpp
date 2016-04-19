@@ -116,7 +116,6 @@ void AVL::insert(char input[30])
 		node2.rightChild = node1.index;
 
 	writeToDisk(node2);
-
 	// if the value of the node we just inserted is less than that of the most recent nonzero balance factor node
 	// then we went left so the pivot needs to be the left child else its the right child
 	// the displacement is set based on the direction taken
@@ -277,11 +276,6 @@ void AVL::insert(char input[30])
 		node1.rightChild = b;
 
 	writeToDisk(node1);
-}
-
-void AVL::setFilePath(std::string filePath)
-{
-	this->filePath = filePath;
 }
 
 void AVL::setStats()
