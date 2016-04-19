@@ -37,9 +37,10 @@ private:
 	unsigned int uniqueInserts = 0;
 	int root = -1;
 	int nodeSize = sizeof(Node);
-	Node readFromDisk(unsigned int index);
+	Node readFromDisk(int index);
 	void writeToDisk(Node node);
-	std::fstream treeFile;
+	std::ifstream inputTreeFile;
+	std::ofstream outputTreeFile;
 	std::string treeFilePath;
 };
 

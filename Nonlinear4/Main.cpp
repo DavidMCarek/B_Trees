@@ -47,7 +47,11 @@ int main()
 			if (nextChar == delimiter)
 			{
 				if (input[0])
+				{
+					cout << input << endl;
 					avl.insert(input);
+				}
+					
 
 				memset(input, 0, sizeof(input));
 				index = -1;

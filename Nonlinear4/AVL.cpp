@@ -10,38 +10,35 @@
 AVL::AVL(std::string treeFilePath)
 {
 	this->treeFilePath = treeFilePath;
-	treeFile.setf(std::ios::binary);
-	treeFile.open(treeFilePath);
-	if (treeFile.fail())
-		std::cout << "failed to open file" << std::endl;
-	treeFile.close();
+	inputTreeFile.open(treeFilePath, std::ios::binary);
+	if (inputTreeFile.fail())
+		std::cout << "failed to open input file" << std::endl;
+	outputTreeFile.open(treeFilePath, std::ios::binary);
+	if (outputTreeFile.fail())
+		std::cout << "failed to open output file" << std::endl;
 }
 
 AVL::~AVL()
 {
-	treeFile.close();
+	inputTreeFile.close();
+	outputTreeFile.close();
 }
 
 void AVL::writeToDisk(Node node)
 {
-	if (node.index < 0)
-		std::cout << "damn it";
-	treeFile.setf(std::ios::binary);
-	treeFile.open(treeFilePath);
-	treeFile.seekp(node.index * sizeof(Node), treeFile.beg);
+	outputTreeFile.seekp(node.index * sizeof(Node));
 	char * buffer = (char *)&node;
-	treeFile.write(buffer, sizeof(Node));
-	treeFile.close();
+	outputTreeFile.write(buffer, sizeof(Node));
+	outputTreeFile.flush();
 }
 
-AVL::Node AVL::readFromDisk(unsigned int index)
+AVL::Node AVL::readFromDisk(int index)
 {
-	treeFile.setf(std::ios::binary);
-	treeFile.open(treeFilePath);
 	Node node;
-	treeFile.seekg(index * sizeof(Node));
-	treeFile.read((char *)&node, sizeof(Node));
-	treeFile.close();
+	if (index == -1)
+		return node;
+	inputTreeFile.seekg(index * sizeof(Node));
+	inputTreeFile.read((char *)&node, sizeof(Node));
 	return node;
 }
 
@@ -54,9 +51,7 @@ void AVL::insert(char input[30])
 	// If the root is null we only need to do a dumb insert and nothing else
 	if (node1.index == -1)
 	{
-		for (int i = 0; i < 30; i++)
-			node1.value[i] = input[i];
-
+		strcpy_s(node1.value, input);
 		node1.count = 1;
 		node1.index = 0;
 		writeToDisk(node1);
@@ -76,8 +71,7 @@ void AVL::insert(char input[30])
 	// while the current node is not at the child of a leaf or a duplicate value keep traversing through the tree
 	// keeping track of the most recent nonzero balance factor node
 
-	if (strcmp("HELENA", node1.value) == 0)
-		std::cout << "pause";
+
 
 	while (p != -1)
 	{
@@ -103,8 +97,7 @@ void AVL::insert(char input[30])
 	// to create a new node to insert
 
 	// node to insert is node1
-	for (int i = 0; i < 30; i++)
-		node1.value[i] = input[i];
+	strcpy_s(node1.value, input);
 	node1.count = 1;
 	node1.index = uniqueInserts;
 	writeToDisk(node1);
@@ -228,7 +221,6 @@ void AVL::insert(char input[30])
 			// then c's balance factor is fixed and set to 0
 			node3.balanceFactor = 0;
 			b = node3.index; // this is for reattaching the subtree to the proper parent
-
 			writeToDisk(node3);
 		}
 	}
