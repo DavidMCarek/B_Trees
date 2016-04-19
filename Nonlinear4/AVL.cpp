@@ -7,9 +7,9 @@
 #include <iostream>
 #include <fstream>
 
+// When tree is initialized open the input and output files
 AVL::AVL(std::string treeFilePath)
 {
-	this->treeFilePath = treeFilePath;
 	inputTreeFile.open(treeFilePath, std::ios::binary);
 	if (inputTreeFile.fail())
 		std::cout << "failed to open input file" << std::endl;
@@ -18,20 +18,26 @@ AVL::AVL(std::string treeFilePath)
 		std::cout << "failed to open output file" << std::endl;
 }
 
+// close the tree files when destructing the tree
 AVL::~AVL()
 {
 	inputTreeFile.close();
 	outputTreeFile.close();
 }
 
+// writes the node to a given location of the output file
+// based on the index of that node
 void AVL::writeToDisk(Node node)
 {
 	outputTreeFile.seekp(node.index * sizeof(Node));
 	char * buffer = (char *)&node;
 	outputTreeFile.write(buffer, sizeof(Node));
 	outputTreeFile.flush();
+	if (outputTreeFile.fail())
+		std::cout << "failed to write to output file" << std::endl;
 }
 
+// reads a node from the file given an index of the file in order to generate an offset
 AVL::Node AVL::readFromDisk(int index)
 {
 	Node node;
@@ -39,6 +45,8 @@ AVL::Node AVL::readFromDisk(int index)
 		return node;
 	inputTreeFile.seekg(index * sizeof(Node));
 	inputTreeFile.read((char *)&node, sizeof(Node));
+	if (inputTreeFile.fail())
+		std::cout << "failed to read from input file" << std::endl;
 	return node;
 }
 
@@ -46,8 +54,11 @@ AVL::Node AVL::readFromDisk(int index)
 // to maintain the balance of the tree
 void AVL::insert(char input[30])
 {
+
+
+
+
 	node1 = readFromDisk(root);
-	
 	// If the root is null we only need to do a dumb insert and nothing else
 	if (node1.index == -1)
 	{
@@ -70,8 +81,6 @@ void AVL::insert(char input[30])
 
 	// while the current node is not at the child of a leaf or a duplicate value keep traversing through the tree
 	// keeping track of the most recent nonzero balance factor node
-
-
 
 	while (p != -1)
 	{

@@ -13,13 +13,8 @@ public:
 private:
 	int numberOfKeys = 11;
 	struct Key {
-		int count = 0;
-		char value[30];
 	};
 	struct Node {
-		Key keys[11];
-		int children[12] = { 0 };
-		int index = -1;
 	};
 	Node node1;
 	Node node2;

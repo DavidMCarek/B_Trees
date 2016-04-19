@@ -38,6 +38,5 @@ private:
 	void writeToDisk(Node node);
 	std::ifstream inputTreeFile;
 	std::ofstream outputTreeFile;
-	std::string treeFilePath;
 };
 

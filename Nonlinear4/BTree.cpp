@@ -28,8 +28,8 @@ void BTree::insert(char input[30])
 
 void BTree::splitChild(Node x, int i) 
 {
-	node1 = readFromDisk(x.index);
-	node2 = readFromDisk(node1.children[i]);
+//	node1 = readFromDisk(x.index);
+//	node2 = readFromDisk(node1.children[i]);
 	
 		/*3  z.leaf = y.leaf
 		4  z.n = t – 1
