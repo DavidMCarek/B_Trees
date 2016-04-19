@@ -13,7 +13,7 @@ AVL::AVL(std::string treeFilePath)
 	inputTreeFile.open(treeFilePath, std::ios::binary);
 	if (inputTreeFile.fail())
 		std::cout << "failed to open input file" << std::endl;
-	outputTreeFile.open(treeFilePath, std::ios::binary);
+	outputTreeFile.open(treeFilePath, std::ios::binary | std::ios::trunc);
 	if (outputTreeFile.fail())
 		std::cout << "failed to open output file" << std::endl;
 }
@@ -26,7 +26,7 @@ AVL::~AVL()
 
 void AVL::writeToDisk(Node node)
 {
-	outputTreeFile.seekp(node.index * sizeof(Node));
+	outputTreeFile.seekp(node.index * sizeof(Node), std::ios::beg);
 	char * buffer = (char *)&node;
 	outputTreeFile.write(buffer, sizeof(Node));
 	outputTreeFile.flush();
@@ -121,7 +121,6 @@ void AVL::insert(char input[30])
 	// the displacement is set based on the direction taken
 
 	node3 = readFromDisk(a);
-
 	if (strcmp(input, node3.value) > 0)
 	{
 		p = node3.rightChild;

@@ -11,15 +11,14 @@ public:
 	void printStats();
 	void setFilePath(std::string filePath);
 private:
-	std::ifstream inputTreeFile;
-	std::ofstream outputTreeFile;
-	std::string treeFilePath;
-	struct Node {
-		int leftChild = -1;
-		int rightChild = -1;
+	int numberOfKeys = 11;
+	struct Key {
+		int count = 0;
 		char value[30];
-		unsigned int count = 0;
-		int balanceFactor = 0;
+	};
+	struct Node {
+		Key keys[11];
+		int children[12] = { 0 };
 		int index = -1;
 	};
 	Node node1;
@@ -29,7 +28,8 @@ private:
 	long itemsInTree = 0;
 	std::chrono::duration<double> totalInsertTime;
 	void setStats();
-	void traverseSetStats(Node node, int nodeHeight);
+	void traverseSetStats(Node x, int nodeHeight);
+	void splitChild(Node node, int i);
 	unsigned int uniqueInserts = 0;
 	int root = -1;
 	Node readFromDisk(int index);
