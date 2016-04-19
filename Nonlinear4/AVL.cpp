@@ -26,7 +26,7 @@ AVL::~AVL()
 
 void AVL::writeToDisk(Node node)
 {
-	outputTreeFile.seekp(node.index * sizeof(Node), std::ios::beg);
+	outputTreeFile.seekp(node.index * sizeof(Node));
 	char * buffer = (char *)&node;
 	outputTreeFile.write(buffer, sizeof(Node));
 	outputTreeFile.flush();
