@@ -12,7 +12,7 @@ using namespace std;
 
 int main()
 {
-	string inputFilePath = "C:\\Users\\DMCar\\Desktop\\a1s1.txt";
+	string inputFilePath = "C:\\Users\\DMCar\\Desktop\\Shakespeare.txt";
 
 	// set of delimiters for reading in the file
 	char delimiters[11] = { 9 , 10 , 13 , 32 , '.' , ',' , '!' , ';' , ':' , '(' , ')' };
@@ -33,7 +33,7 @@ int main()
 	char nextChar;
 	inputStream.get(nextChar);
 
-	char input[30]{ 0 };
+	char input[50]{ 0 };
 	int index = 0;
 
 	// keep getting bytes until we have reached the end of the file
@@ -48,7 +48,7 @@ int main()
 			{
 				if (input[0])
 				{
-					cout << input << endl;
+					//cout << input << endl;
 					avl.insert(input);
 				}
 					

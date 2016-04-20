@@ -2,6 +2,7 @@
 #include <string>
 #include <chrono>
 #include <fstream>
+#define treeDegree 8
 class BTree
 {
 public:
@@ -11,10 +12,13 @@ public:
 	void printStats();
 	void setFilePath(std::string filePath);
 private:
-	int numberOfKeys = 11;
-	struct Key {
-	};
 	struct Node {
+		int numberOfKeys = 0;
+		char keys[2 * treeDegree] = { 0 };
+		int count[2 * treeDegree] = { 0 };
+		int children[2 * treeDegree + 1] = { 0 };
+		int index = -1;
+		bool isLeaf = false;
 	};
 	Node node1;
 	Node node2;
@@ -26,7 +30,7 @@ private:
 	void traverseSetStats(Node x, int nodeHeight);
 	void splitChild(Node node, int i);
 	unsigned int uniqueInserts = 0;
-	int root = -1;
+	int root = 0;
 	Node readFromDisk(int index);
 	void writeToDisk(Node node);
 	std::ifstream inputTreeFile;

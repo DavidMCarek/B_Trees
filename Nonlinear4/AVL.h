@@ -15,11 +15,12 @@ public:
 	~AVL();
 	void insert(char input[30]);
 	void printStats();
+	void setInsertTime(std::chrono::duration<double> time);
 private:
 	struct Node {
 		int leftChild = -1;
 		int rightChild = -1;
-		char value[30];
+		char value[50];
 		unsigned int count = 0;
 		int balanceFactor = 0;
 		int index = -1;
@@ -36,7 +37,8 @@ private:
 	int root = -1;
 	Node readFromDisk(int index);
 	void writeToDisk(Node node);
-	std::ifstream inputTreeFile;
-	std::ofstream outputTreeFile;
+	std::fstream treeFile;
+	int reads = 0;
+	int writes = 0;
 };
 

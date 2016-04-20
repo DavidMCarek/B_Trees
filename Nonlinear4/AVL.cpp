@@ -10,31 +10,26 @@
 // When tree is initialized open the input and output files
 AVL::AVL(std::string treeFilePath)
 {
-	inputTreeFile.open(treeFilePath, std::ios::binary);
-	if (inputTreeFile.fail())
-		std::cout << "failed to open input file" << std::endl;
-	outputTreeFile.open(treeFilePath, std::ios::binary | std::ios::trunc);
-	if (outputTreeFile.fail())
-		std::cout << "failed to open output file" << std::endl;
+	treeFile.open(treeFilePath, std::ios::binary | std::ios::trunc | std::ios::in | std::ios::out);
+	if (treeFile.fail())
+		std::cout << "failed to open tree file" << std::endl;
 }
 
 // close the tree files when destructing the tree
 AVL::~AVL()
 {
-	inputTreeFile.close();
-	outputTreeFile.close();
+	treeFile.close();
 }
 
 // writes the node to a given location of the output file
 // based on the index of that node
 void AVL::writeToDisk(Node node)
 {
-	outputTreeFile.seekp(node.index * sizeof(Node));
+	treeFile.seekp(node.index * sizeof(Node));
 	char * buffer = (char *)&node;
-	outputTreeFile.write(buffer, sizeof(Node));
-	outputTreeFile.flush();
-	if (outputTreeFile.fail())
-		std::cout << "failed to write to output file" << std::endl;
+	treeFile.write(buffer, sizeof(Node));
+	writes++;
+	treeFile.flush();
 }
 
 // reads a node from the file given an index of the file in order to generate an offset
@@ -43,10 +38,9 @@ AVL::Node AVL::readFromDisk(int index)
 	Node node;
 	if (index == -1)
 		return node;
-	inputTreeFile.seekg(index * sizeof(Node));
-	inputTreeFile.read((char *)&node, sizeof(Node));
-	if (inputTreeFile.fail())
-		std::cout << "failed to read from input file" << std::endl;
+	treeFile.seekg(index * sizeof(Node));
+	treeFile.read((char *)&node, sizeof(Node));
+	reads++;
 	return node;
 }
 
@@ -322,5 +316,14 @@ void AVL::printStats()
 		<< "Total items : " << itemsInTree << std::endl
 		<< "Unique items : " << uniqueInserts << std::endl
 		<< "Number of nodes : " << uniqueInserts << std::endl
+		<< "Total reads : " << reads << std::endl
+		<< "Total writes : " << writes << std::endl;
+	printf("Total insert time : %3d\n", totalInsertTime);
+	std::cout
 		<< "<---------------------------------->" << std::endl << std::endl;
+}
+
+void AVL::setInsertTime(std::chrono::duration<double> time)
+{
+	totalInsertTime = time;
 }

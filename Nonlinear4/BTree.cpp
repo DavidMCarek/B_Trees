@@ -21,33 +21,48 @@ BTree::~BTree()
 	outputTreeFile.close();
 }
 
-void BTree::insert(char input[30])
+BTree::Node BTree::readFromDisk(int index)
 {
 
 }
 
+void BTree::writeToDisk(BTree::Node node)
+{
+
+}
+
+void BTree::insert(char input[30])
+{
+	node1 = readFromDisk(root);
+}
+
 void BTree::splitChild(Node x, int i) 
 {
-//	node1 = readFromDisk(x.index);
-//	node2 = readFromDisk(node1.children[i]);
-	
-		/*3  z.leaf = y.leaf
-		4  z.n = t – 1
-		5  for j = 1 to t – 1
-		6       z.keyj = y.keyj + t
-		7  if not y.leaf
-		8       for j = 1 to t
-		9            z.cj = y.cj + t
-		10  y.n = t – 1
-		11  for j = x.n + 1 downto i + 1
-		12       x.cj + 1 = x.cj
-		13  x.ci + 1 = z
-		14  for j = x.n downto i
-		15       x.keyj + 1 = x.keyj
-		16  x.keyi = y.keyt
-		17  x.n = x.n + 1
-		18  Disk - Write(y)
-		19  Disk - Write(z)
-		20  Disk - Write(x)
-*/
+	node1 = readFromDisk(x.index);
+	node2 = readFromDisk(node1.children[i]);
+	node3.isLeaf = node2.isLeaf;
+	node3.numberOfKeys = treeDegree - 1;
+
+	for (int j = 1; j <= treeDegree - 1; j++)
+		node3.keys[j] = node2.keys[j + treeDegree];
+
+	if (!node2.isLeaf)
+		for (int j = 1; j <= treeDegree; j++)
+			node3.children[j] = node2.children[j + treeDegree];
+
+	node2.numberOfKeys = treeDegree - 1;
+
+	for (int j = node1.numberOfKeys + 1; j >= i + 1; j--)
+		node1.children[j + 1] = node1.children[j];
+
+	node1.children[i + 1] = node3.index;
+
+	for (int j = node1.numberOfKeys; j >= i; j--)
+		node1.keys[j + 1] = node1.keys[j];
+
+	node1.keys[i] = node2.keys[treeDegree];
+	node1.numberOfKeys = node1.numberOfKeys + 1;
+	writeToDisk(node2);
+	writeToDisk(node3);
+	writeToDisk(node1);
 }
