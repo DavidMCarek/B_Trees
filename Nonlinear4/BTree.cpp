@@ -3,37 +3,51 @@
 #include <fstream>
 #include <iostream>
 
-BTree::BTree()
+BTree::BTree(std::string treeFilePath)
 {
-	this->treeFilePath = treeFilePath;
-	inputTreeFile.open(treeFilePath, std::ios::binary);
-	if (inputTreeFile.fail())
-		std::cout << "failed to open input file" << std::endl;
-	outputTreeFile.open(treeFilePath, std::ios::binary);
-	if (outputTreeFile.fail())
-		std::cout << "failed to open output file" << std::endl;
+	treeFile.open(treeFilePath, std::ios::binary | std::ios::trunc | std::ios::in | std::ios::out);
+	if (treeFile.fail())
+		std::cout << "failed to open tree file" << std::endl;
 }
 
 
 BTree::~BTree()
 {
-	inputTreeFile.close();
-	outputTreeFile.close();
+	treeFile.close();
 }
 
 BTree::Node BTree::readFromDisk(int index)
 {
-
+	Node node;
+	if (index == -1)
+		return node;
+	treeFile.seekg(index * sizeof(Node));
+	treeFile.read((char *)&node, sizeof(Node));
+	reads++;
+	return node;
 }
 
 void BTree::writeToDisk(BTree::Node node)
 {
-
+	treeFile.seekp(node.index * sizeof(Node));
+	char * buffer = (char *)&node;
+	treeFile.write(buffer, sizeof(Node));
+	writes++;
+	treeFile.flush();
 }
+
 
 void BTree::insert(char input[30])
 {
 	node1 = readFromDisk(root);
+
+	if (node1.numberOfKeys == (2 * treeDegree - 1))
+	{
+		root = uniqueInserts;
+		memset(node2.children, 0, sizeof(node2.children));
+	}
+		
+
 }
 
 void BTree::splitChild(Node x, int i) 
@@ -65,4 +79,37 @@ void BTree::splitChild(Node x, int i)
 	writeToDisk(node2);
 	writeToDisk(node3);
 	writeToDisk(node1);
+}
+
+
+void BTree::setStats()
+{
+	treeHeight = 0;
+	itemsInTree = 0;
+	if (root == 0)
+		return;
+
+	// if the set is not empty traverse the list in order and output the node values and counts
+	traverseSetStats(readFromDisk(root), treeHeight);
+}
+
+void BTree::traverseSetStats(Node node, int nodeHeight)
+{
+
+}
+
+void BTree::printStats()
+{
+	setStats();
+	std::cout
+		<< "<----------AVL Statistics---------->" << std::endl
+		<< "Tree height : " << treeHeight << std::endl
+		<< "Total items : " << itemsInTree << std::endl
+		<< "Unique items : " << uniqueInserts << std::endl
+		<< "Number of nodes : " << uniqueInserts << std::endl
+		<< "Total reads : " << reads << std::endl
+		<< "Total writes : " << writes << std::endl;
+	printf("Insert time : %.3f s\n", totalInsertTime.count());
+	std::cout
+		<< "<---------------------------------->" << std::endl << std::endl;
 }

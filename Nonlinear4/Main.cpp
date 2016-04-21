@@ -36,6 +36,9 @@ int main()
 	char input[50]{ 0 };
 	int index = 0;
 
+	chrono::time_point<chrono::system_clock> start, end;
+	start = chrono::system_clock::now();
+
 	// keep getting bytes until we have reached the end of the file
 	while (!inputStream.eof())
 	{
@@ -81,7 +84,15 @@ int main()
 		avl.insert(input);
 	}
 
+	end = std::chrono::system_clock::now();
+	avl.setInsertTime(end - start);
+
 	avl.printStats();
+
+	// then we wait for the user to finish viewing the data
+	cout << "Processing finished. Press ENTER to exit" << endl;
+	char waitChar;
+	cin.get(waitChar);
 
     return 0;
 }

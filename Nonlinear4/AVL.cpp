@@ -282,7 +282,6 @@ void AVL::insert(char input[30])
 		writeToDisk(node3);
 }
 
-
 void AVL::setStats()
 {
 	treeHeight = 0;
@@ -318,7 +317,7 @@ void AVL::printStats()
 		<< "Number of nodes : " << uniqueInserts << std::endl
 		<< "Total reads : " << reads << std::endl
 		<< "Total writes : " << writes << std::endl;
-	printf("Total insert time : %3d\n", totalInsertTime);
+	printf("Insert time : %.3f s\n", totalInsertTime.count());
 	std::cout
 		<< "<---------------------------------->" << std::endl << std::endl;
 }

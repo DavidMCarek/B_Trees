@@ -6,11 +6,10 @@
 class BTree
 {
 public:
-	BTree();
+	BTree(std::string inputTreeFile);
 	~BTree(); 
 	void insert(char input[30]);
 	void printStats();
-	void setFilePath(std::string filePath);
 private:
 	struct Node {
 		int numberOfKeys = 0;
@@ -33,8 +32,8 @@ private:
 	int root = 0;
 	Node readFromDisk(int index);
 	void writeToDisk(Node node);
-	std::ifstream inputTreeFile;
-	std::ofstream outputTreeFile;
-	std::string treeFilePath;
+	std::fstream treeFile;
+	int reads = 0;
+	int writes = 0;
 };
 
