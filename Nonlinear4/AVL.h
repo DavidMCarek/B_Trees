@@ -7,6 +7,7 @@
 #include <string>
 #include <chrono>
 #include <fstream>
+#include "globals.h"
 
 class AVL
 {
@@ -20,7 +21,7 @@ private:
 	struct Node {
 		int leftChild = -1;
 		int rightChild = -1;
-		char value[50];
+		char value[maxInputSize];
 		unsigned int count = 0;
 		int balanceFactor = 0;
 		int index = -1;

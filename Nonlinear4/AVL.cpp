@@ -6,6 +6,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include "globals.h"
 
 // When tree is initialized open the input and output files
 AVL::AVL(std::string treeFilePath)

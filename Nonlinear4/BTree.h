@@ -2,33 +2,34 @@
 #include <string>
 #include <chrono>
 #include <fstream>
-#define treeDegree 8
+#include "globals.h"
+
 class BTree
 {
 public:
 	BTree(std::string inputTreeFile);
 	~BTree(); 
-	void insert(char input[30]);
+	void insert(char input[maxInputSize]);
 	void printStats();
+	void setInsertTime(std::chrono::duration<double> time);
 private:
 	struct Node {
 		int numberOfKeys = 0;
-		char keys[2 * treeDegree] = { 0 };
+		char keys[2 * treeDegree][maxInputSize] = { 0 };
 		int count[2 * treeDegree] = { 0 };
 		int children[2 * treeDegree + 1] = { 0 };
-		int index = -1;
+		int index = 0;
 		bool isLeaf = false;
 	};
-	Node node1;
-	Node node2;
-	Node node3;
-	int treeHeight = 0;
+	void insertNonFull(Node node, char input[maxInputSize]);
+	int uniqueItems = 0;
+	int treeHeight = -1;
 	long itemsInTree = 0;
 	std::chrono::duration<double> totalInsertTime;
+	bool isRepeat(Node node, char input[maxInputSize]);
 	void setStats();
-	void traverseSetStats(Node x, int nodeHeight);
 	void splitChild(Node node, int i);
-	unsigned int uniqueInserts = 0;
+	unsigned int nodeCount = 0;
 	int root = 0;
 	Node readFromDisk(int index);
 	void writeToDisk(Node node);

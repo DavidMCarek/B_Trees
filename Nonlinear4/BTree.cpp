@@ -2,6 +2,7 @@
 #include "BTree.h"
 #include <fstream>
 #include <iostream>
+#include "globals.h"
 
 BTree::BTree(std::string treeFilePath)
 {
@@ -19,8 +20,6 @@ BTree::~BTree()
 BTree::Node BTree::readFromDisk(int index)
 {
 	Node node;
-	if (index == -1)
-		return node;
 	treeFile.seekg(index * sizeof(Node));
 	treeFile.read((char *)&node, sizeof(Node));
 	reads++;
@@ -36,80 +35,174 @@ void BTree::writeToDisk(BTree::Node node)
 	treeFile.flush();
 }
 
-
-void BTree::insert(char input[30])
+bool BTree::isRepeat(Node node, char input[maxInputSize])
 {
-	node1 = readFromDisk(root);
-
-	if (node1.numberOfKeys == (2 * treeDegree - 1))
+	int i = 1;
+	while (i <= node.numberOfKeys && strcmp(input, node.keys[i]) > 0)
+		i++;
+	if (i <= node.numberOfKeys && strcmp(input, node.keys[i]) == 0)
 	{
-		root = uniqueInserts;
-		memset(node2.children, 0, sizeof(node2.children));
+		node.count[i]++;
+		writeToDisk(node);
+		return true;
 	}
-		
+	else if (node.isLeaf)
+		return false;
+	else
+	{
+		node = readFromDisk(node.children[i]);
+		return isRepeat(node, input);
+	}
+}
 
+void BTree::insert(char input[maxInputSize])
+{
+	itemsInTree++;
+	Node r;
+
+	if (root == 0)
+	{
+		r.count[1] = 1;
+		root = r.index = 1;
+		r.isLeaf = true;
+		strcpy_s(r.keys[1], input);
+		r.numberOfKeys++;
+		writeToDisk(r);
+		nodeCount++;
+		uniqueItems++;
+		return;
+	}
+
+	r = readFromDisk(root);
+
+	if (isRepeat(r, input))
+		return;
+
+	uniqueItems++;
+		
+	if (r.numberOfKeys == (2 * treeDegree - 1))
+	{
+		Node s;
+		nodeCount++;
+		root = s.index = nodeCount;
+		s.isLeaf = false;
+		s.numberOfKeys = 0;
+		s.children[1] = r.index; 
+		splitChild(s ,1);
+		s = readFromDisk(s.index);
+		insertNonFull(s, input);
+	}
+	else
+		insertNonFull(r, input);
+	
+}
+
+void BTree::insertNonFull(Node x, char input[maxInputSize])
+{
+	int i = x.numberOfKeys;
+	if (x.isLeaf)
+	{
+		while (i >= 1 && (strcmp(input, x.keys[i]) < 0))
+		{
+			strcpy_s(x.keys[i + 1], x.keys[i]);
+			x.count[i + 1] = x.count[i];
+			i = i - 1;
+		}
+		strcpy_s(x.keys[i + 1], input);
+		x.count[i + 1] = 1;
+		x.numberOfKeys++;
+		writeToDisk(x);
+	}
+	else
+	{
+		while (i >= 1 && (strcmp(input, x.keys[i]) < 0))
+			i--;
+		i++;
+
+		if (readFromDisk(x.children[i]).numberOfKeys == (2 * treeDegree - 1))
+		{
+			splitChild(x, i);
+			x = readFromDisk(x.index);
+			if (strcmp(input, x.keys[i]) > 0)
+				i++;
+		}
+		insertNonFull(readFromDisk(x.children[i]), input);
+	}		
 }
 
 void BTree::splitChild(Node x, int i) 
 {
-	node1 = readFromDisk(x.index);
-	node2 = readFromDisk(node1.children[i]);
-	node3.isLeaf = node2.isLeaf;
-	node3.numberOfKeys = treeDegree - 1;
+	nodeCount++;
+	Node y = readFromDisk(x.children[i]);
+	Node z;
+	z.index = nodeCount;
+	z.isLeaf = y.isLeaf;
+	z.numberOfKeys = treeDegree - 1;
 
 	for (int j = 1; j <= treeDegree - 1; j++)
-		node3.keys[j] = node2.keys[j + treeDegree];
+	{
+		strcpy_s(z.keys[j], y.keys[j + treeDegree]);
+		z.count[j] = y.count[j + treeDegree];
+	}
 
-	if (!node2.isLeaf)
+	if (!y.isLeaf)
 		for (int j = 1; j <= treeDegree; j++)
-			node3.children[j] = node2.children[j + treeDegree];
+			z.children[j] = y.children[j + treeDegree];
 
-	node2.numberOfKeys = treeDegree - 1;
+	y.numberOfKeys = treeDegree - 1;
 
-	for (int j = node1.numberOfKeys + 1; j >= i + 1; j--)
-		node1.children[j + 1] = node1.children[j];
+	for (int j = x.numberOfKeys + 1; j >= i + 1; j--)
+		x.children[j + 1] = x.children[j];
 
-	node1.children[i + 1] = node3.index;
+	x.children[i + 1] = z.index;
 
-	for (int j = node1.numberOfKeys; j >= i; j--)
-		node1.keys[j + 1] = node1.keys[j];
-
-	node1.keys[i] = node2.keys[treeDegree];
-	node1.numberOfKeys = node1.numberOfKeys + 1;
-	writeToDisk(node2);
-	writeToDisk(node3);
-	writeToDisk(node1);
+	for (int j = x.numberOfKeys; j >= i; j--)
+	{
+		strcpy_s(x.keys[j + 1], x.keys[j]);
+		x.count[j + 1] = x.count[j];
+	}
+		
+	strcpy_s(x.keys[i], y.keys[treeDegree]);
+	x.count[i] = y.count[treeDegree];
+	x.numberOfKeys++;
+	writeToDisk(y);
+	writeToDisk(z);
+	writeToDisk(x);
 }
-
 
 void BTree::setStats()
 {
 	treeHeight = 0;
-	itemsInTree = 0;
 	if (root == 0)
 		return;
 
+	Node node = readFromDisk(root);
+
 	// if the set is not empty traverse the list in order and output the node values and counts
-	traverseSetStats(readFromDisk(root), treeHeight);
-}
-
-void BTree::traverseSetStats(Node node, int nodeHeight)
-{
-
+	while (!node.isLeaf)
+	{
+		node = readFromDisk(node.children[1]);
+		treeHeight++;
+	}
 }
 
 void BTree::printStats()
 {
 	setStats();
 	std::cout
-		<< "<----------AVL Statistics---------->" << std::endl
+		<< "<---------BTree Statistics--------->" << std::endl
 		<< "Tree height : " << treeHeight << std::endl
 		<< "Total items : " << itemsInTree << std::endl
-		<< "Unique items : " << uniqueInserts << std::endl
-		<< "Number of nodes : " << uniqueInserts << std::endl
+		<< "Unique items : " << uniqueItems << std::endl
+		<< "Number of nodes : " << nodeCount << std::endl
 		<< "Total reads : " << reads << std::endl
 		<< "Total writes : " << writes << std::endl;
 	printf("Insert time : %.3f s\n", totalInsertTime.count());
 	std::cout
 		<< "<---------------------------------->" << std::endl << std::endl;
+}
+
+void BTree::setInsertTime(std::chrono::duration<double> time)
+{
+	totalInsertTime = time;
 }
