@@ -1,5 +1,5 @@
 // Nonlinear Data structures
-// EECS 2510 : Lab 4
+// EECS 2510 : AVL vs BTREE Lab 4
 // David Carek
 
 #include "stdafx.h"

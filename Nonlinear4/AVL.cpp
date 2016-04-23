@@ -1,4 +1,4 @@
-// EECS 2510 : BST VS AVL VS RBT
+// EECS 2510 : AVL vs BTREE
 // David Carek
 
 #include "stdafx.h"
@@ -8,7 +8,7 @@
 #include <fstream>
 #include "globals.h"
 
-// When tree is initialized open the input and output files
+// When tree is initialized open the file
 AVL::AVL(std::string treeFilePath)
 {
 	treeFile.open(treeFilePath, std::ios::binary | std::ios::trunc | std::ios::in | std::ios::out);
@@ -22,8 +22,7 @@ AVL::~AVL()
 	treeFile.close();
 }
 
-// writes the node to a given location of the output file
-// based on the index of that node
+// writes the node to a given location of the output file based on the index of that node
 void AVL::writeToDisk(Node node)
 {
 	treeFile.seekp(node.index * sizeof(Node));
@@ -102,7 +101,7 @@ void AVL::insert(char input[30])
 		// node to insert is y
 		node1.balanceFactor = 0;
 		node1.count = 1;
-		int y = node1.index = uniqueInserts;
+		int y = node1.index = uniqueInserts; // its index is saved for later use
 		node1.leftChild = -1;
 		node1.rightChild = -1;
 		strcpy_s(node1.value, input);
@@ -185,6 +184,8 @@ void AVL::insert(char input[30])
 		// At this point we have thrown the tree out of balance by inserting
 		// The displacement tells us the first direction of the rotation and the most recent non-zero balance factor node (b) 
 		// tells us the second direction
+
+		// for the next section node a, b, and c correspond to node1, node2, and node3
 		if (displacement == 1)
 		{
 			if (node2.balanceFactor == 1) //LL
@@ -283,6 +284,7 @@ void AVL::insert(char input[30])
 		writeToDisk(node3);
 }
 
+// Sets important statistics about the AVL tree built
 void AVL::setStats()
 {
 	treeHeight = 0;
@@ -294,6 +296,7 @@ void AVL::setStats()
 	traverseSetStats(readFromDisk(root), treeHeight);
 }
 
+// traverse the tree to set stats like tree height 
 void AVL::traverseSetStats(Node node, int nodeHeight)
 {
 	itemsInTree += node.count;
@@ -307,6 +310,7 @@ void AVL::traverseSetStats(Node node, int nodeHeight)
 		treeHeight = nodeHeight;
 }
 
+// display to the user statistics about the tree
 void AVL::printStats()
 {
 	setStats();
@@ -323,6 +327,7 @@ void AVL::printStats()
 		<< "<---------------------------------->" << std::endl << std::endl;
 }
 
+// set the time it took to insert a file into the tree
 void AVL::setInsertTime(std::chrono::duration<double> time)
 {
 	totalInsertTime = time;

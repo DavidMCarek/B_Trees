@@ -1,4 +1,4 @@
-// EECS 2510 : BST VS AVL VS RBT
+// EECS 2510 : AVL vs BTREE
 // David Carek
 
 // This class is used to create a type of height balanced tree called an AVL tree

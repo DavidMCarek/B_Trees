@@ -1,9 +1,15 @@
+// EECS 2510 : AVL vs BTREE
+// David Carek
+
 #pragma once
 #include <string>
 #include <chrono>
 #include <fstream>
 #include "globals.h"
 
+// Produces a data structure with 2 or more keys on a node to reduce the amount of reading
+// and writing for disk based operations. This makes the processor take a slight hit in performance 
+// but since disk operations are more costly, speed is increased greatly
 class BTree
 {
 public:
